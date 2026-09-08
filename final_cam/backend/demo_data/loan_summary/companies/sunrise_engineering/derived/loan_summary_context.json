@@ -1,0 +1,88 @@
+{
+  "borrower": {
+    "name": "Sunrise Engineering Pvt. Ltd.",
+    "constitution": "Private Limited Company",
+    "industry": "Manufacturing of Industrial Machinery",
+    "business_vintage_years": 14,
+    "existing_customer": true,
+    "cin": "U28910KA2012PTC900101",
+    "gstin": "29AAECS9001A1Z1",
+    "location": "Bengaluru, Karnataka"
+  },
+  "proposal": {
+    "facility_type": "Cash Credit",
+    "requested_amount_cr": 5.0,
+    "purpose": "Working capital for higher order-book execution and inventory procurement",
+    "tenure_months": 60,
+    "interest_rate_pct": 9.1,
+    "repayment": "Satisfactory"
+  },
+  "financials": {
+    "latest_fy": "FY2023-24",
+    "revenue_cr": 120.5,
+    "ebitda_cr": 18.6,
+    "pat_cr": 9.25,
+    "net_worth_cr": 45.3,
+    "total_debt_cr": 32.1,
+    "working_capital_cr": 13.6
+  },
+  "ratios": {
+    "dscr": 2.13,
+    "icr": 3.21,
+    "debt_equity": 0.71,
+    "current_ratio": 1.34,
+    "ebitda_margin_pct": 15.44,
+    "pat_margin_pct": 7.68
+  },
+  "credit": {
+    "bureau_score": 742,
+    "pd_pct": 1.8,
+    "repayment_conduct": "Satisfactory",
+    "overdue_cr": 0
+  },
+  "risk": {
+    "rating": "Low",
+    "major_risks": [
+      "Customer concentration in top 5 clients",
+      "Raw-material price volatility"
+    ],
+    "mitigants": [
+      "Long-standing customer contracts",
+      "Adequate DSCR and collateral coverage"
+    ]
+  },
+  "collateral": {
+    "gross_value_cr": 47.25,
+    "net_value_cr": 36.1,
+    "coverage_ratio": 7.22,
+    "securities": [
+      {
+        "type": "Industrial land & building",
+        "gross_value_cr": 25.0,
+        "net_value_cr": 20.0
+      },
+      {
+        "type": "Plant & machinery",
+        "gross_value_cr": 12.0,
+        "net_value_cr": 8.4
+      },
+      {
+        "type": "Inventory & receivables",
+        "gross_value_cr": 10.25,
+        "net_value_cr": 7.7
+      }
+    ]
+  },
+  "compliance": {
+    "kyc": "Verified",
+    "sanctions": "Clear",
+    "pep": "No Match",
+    "adverse_media": "No Material Adverse Match",
+    "policy_observations": [
+      {
+        "rule": "Core financial thresholds",
+        "status": "No material deviation in synthetic policy checks"
+      }
+    ]
+  }
+}

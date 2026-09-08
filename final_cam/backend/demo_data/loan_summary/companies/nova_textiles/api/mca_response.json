@@ -1,0 +1,23 @@
+{
+  "provider": "MOCK_MCA",
+  "status": "success",
+  "cin": "U17120RJ2014PTC900505",
+  "company_name": "Nova Textiles Pvt. Ltd.",
+  "company_status": "Active",
+  "incorporation_year": 2014,
+  "registered_state": "Rajasthan",
+  "registered_city": "Jaipur",
+  "authorized_capital_cr": 14.85,
+  "paid_up_capital_cr": 9.24,
+  "industry": "Textile Manufacturing",
+  "directors": [
+    {
+      "name": "Promoter A",
+      "designation": "Managing Director"
+    },
+    {
+      "name": "Promoter B",
+      "designation": "Director"
+    }
+  ]
+}

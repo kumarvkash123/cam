@@ -1,0 +1,7 @@
+{
+  "provider": "MOCK_CORE_BANKING",
+  "existing_customer": true,
+  "relationship_since": 2012,
+  "average_utilisation_pct": 88,
+  "account_conduct": "Satisfactory with occasional utilisation above 90%"
+}

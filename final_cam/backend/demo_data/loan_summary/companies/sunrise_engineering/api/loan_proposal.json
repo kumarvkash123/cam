@@ -1,0 +1,10 @@
+{
+  "borrower": "Sunrise Engineering Pvt. Ltd.",
+  "facility_type": "Cash Credit",
+  "requested_amount_cr": 5.0,
+  "purpose": "Working capital for higher order-book execution and inventory procurement",
+  "tenure_months": 60,
+  "rate_pct": 9.1,
+  "repayment": "Satisfactory",
+  "rm": "Rajesh Sharma"
+}

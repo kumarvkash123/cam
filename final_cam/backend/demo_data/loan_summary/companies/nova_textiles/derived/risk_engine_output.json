@@ -1,0 +1,15 @@
+{
+  "risk_rating": "High",
+  "major_risks": [
+    "Declining revenue and margins",
+    "Weakening DSCR and high leverage",
+    "Export receivable concentration"
+  ],
+  "mitigants": [
+    "Order-backed borrowing structure",
+    "Additional collateral and escrow of export receivables proposed"
+  ],
+  "bureau_score": 664,
+  "pd_pct": 6.8,
+  "repayment_conduct": "Watchlist; recurring 20-30 day delays in one facility"
+}

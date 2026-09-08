@@ -1,0 +1,7 @@
+{
+  "provider": "MOCK_MARKET_DATA",
+  "industry": "Auto Components Manufacturing",
+  "industry_growth_pct": 7.2,
+  "industry_median_ebitda_margin_pct": 13.5,
+  "borrower_ebitda_margin_pct": 12.71
+}

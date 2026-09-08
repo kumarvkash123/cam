@@ -1,0 +1,9 @@
+{
+  "provider": "MOCK_GSTN",
+  "status": "Active",
+  "gstin": "24AAGCG9003C1Z5",
+  "legal_name": "GreenLeaf Foods Pvt. Ltd.",
+  "state": "Gujarat",
+  "fy_turnover_cr": 91.3,
+  "return_compliance_pct": 100
+}

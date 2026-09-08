@@ -1,0 +1,9 @@
+{
+  "provider": "MOCK_GSTN",
+  "status": "Active",
+  "gstin": "27AAFCB2712L1Z8",
+  "legal_name": "Bell Flower Trading Co. Pvt. Ltd.",
+  "state": "Maharashtra",
+  "fy_turnover_cr": 88.4,
+  "return_compliance_pct": 100
+}

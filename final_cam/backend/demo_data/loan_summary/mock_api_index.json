@@ -1,0 +1,90 @@
+{
+  "base_url": "http://127.0.0.1:5000/mock-api",
+  "companies": [
+    {
+      "slug": "sunrise_engineering",
+      "name": "Sunrise Engineering Pvt. Ltd.",
+      "cin": "U28910KA2012PTC900101",
+      "gstin": "29AAECS9001A1Z1",
+      "endpoints": {
+        "mca": "/mock-api/sunrise_engineering/mca",
+        "gst": "/mock-api/sunrise_engineering/gst",
+        "pan": "/mock-api/sunrise_engineering/pan",
+        "udyam": "/mock-api/sunrise_engineering/udyam",
+        "bureau": "/mock-api/sunrise_engineering/bureau",
+        "banking": "/mock-api/sunrise_engineering/banking",
+        "screening": "/mock-api/sunrise_engineering/screening",
+        "industry": "/mock-api/sunrise_engineering/industry",
+        "proposal": "/mock-api/sunrise_engineering/proposal"
+      }
+    },
+    {
+      "slug": "bellflower_trading",
+      "name": "Bell Flower Trading Co. Pvt. Ltd.",
+      "cin": "U51909MH2015PTC271234",
+      "gstin": "27AAFCB2712L1Z8",
+      "endpoints": {
+        "mca": "/mock-api/bellflower_trading/mca",
+        "gst": "/mock-api/bellflower_trading/gst",
+        "pan": "/mock-api/bellflower_trading/pan",
+        "udyam": "/mock-api/bellflower_trading/udyam",
+        "bureau": "/mock-api/bellflower_trading/bureau",
+        "banking": "/mock-api/bellflower_trading/banking",
+        "screening": "/mock-api/bellflower_trading/screening",
+        "industry": "/mock-api/bellflower_trading/industry",
+        "proposal": "/mock-api/bellflower_trading/proposal"
+      }
+    },
+    {
+      "slug": "greenleaf_foods",
+      "name": "GreenLeaf Foods Pvt. Ltd.",
+      "cin": "U15490GJ2016PTC900303",
+      "gstin": "24AAGCG9003C1Z5",
+      "endpoints": {
+        "mca": "/mock-api/greenleaf_foods/mca",
+        "gst": "/mock-api/greenleaf_foods/gst",
+        "pan": "/mock-api/greenleaf_foods/pan",
+        "udyam": "/mock-api/greenleaf_foods/udyam",
+        "bureau": "/mock-api/greenleaf_foods/bureau",
+        "banking": "/mock-api/greenleaf_foods/banking",
+        "screening": "/mock-api/greenleaf_foods/screening",
+        "industry": "/mock-api/greenleaf_foods/industry",
+        "proposal": "/mock-api/greenleaf_foods/proposal"
+      }
+    },
+    {
+      "slug": "apex_auto_components",
+      "name": "Apex Auto Components Pvt. Ltd.",
+      "cin": "U34300TN2010PTC900404",
+      "gstin": "33AALCA9004D1Z2",
+      "endpoints": {
+        "mca": "/mock-api/apex_auto_components/mca",
+        "gst": "/mock-api/apex_auto_components/gst",
+        "pan": "/mock-api/apex_auto_components/pan",
+        "udyam": "/mock-api/apex_auto_components/udyam",
+        "bureau": "/mock-api/apex_auto_components/bureau",
+        "banking": "/mock-api/apex_auto_components/banking",
+        "screening": "/mock-api/apex_auto_components/screening",
+        "industry": "/mock-api/apex_auto_components/industry",
+        "proposal": "/mock-api/apex_auto_components/proposal"
+      }
+    },
+    {
+      "slug": "nova_textiles",
+      "name": "Nova Textiles Pvt. Ltd.",
+      "cin": "U17120RJ2014PTC900505",
+      "gstin": "08AAECN9005E1Z7",
+      "endpoints": {
+        "mca": "/mock-api/nova_textiles/mca",
+        "gst": "/mock-api/nova_textiles/gst",
+        "pan": "/mock-api/nova_textiles/pan",
+        "udyam": "/mock-api/nova_textiles/udyam",
+        "bureau": "/mock-api/nova_textiles/bureau",
+        "banking": "/mock-api/nova_textiles/banking",
+        "screening": "/mock-api/nova_textiles/screening",
+        "industry": "/mock-api/nova_textiles/industry",
+        "proposal": "/mock-api/nova_textiles/proposal"
+      }
+    }
+  ]
+}

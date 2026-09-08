@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CAM AI Platform</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .rag-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.rag-box{min-height:260px;max-height:420px;overflow:auto;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px}.rag-msg{display:flex;margin:9px 0}.rag-msg.ai{justify-content:flex-start}.rag-msg.user{justify-content:flex-end}.rag-bubble{max-width:88%;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #e5e7eb;white-space:pre-wrap}.rag-msg.user .rag-bubble{background:#eef4ff}.citation{margin-top:8px;padding:7px 9px;background:#f5f7fa;border-left:3px solid #2563eb;font-size:12px}.source-list{margin-top:12px}.source-item{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #eee}.chat-input-row{display:flex;gap:8px;margin-top:10px}.chat-input-row input{flex:1}.policy-next{margin-top:12px}.locked{opacity:.65;pointer-events:none}.status-badge.indexed{background:#e8f7ee;color:#16743b}.status-badge.failed{background:#fdecec;color:#b3261e}
+    @media(max-width:900px){.rag-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page-header">
+    <div><div class="eyebrow">CREDIT APPRAISAL</div><h1>CAM AI Platform</h1><p class="muted">Policy-first appraisal workflow with source-grounded document chat, OCR, MCA enrichment and final CAM generation.</p></div>
+    <div class="secure-pill">● Bank CAM POC</div>
+  </header>
+
+  <section class="card">
+    <div class="section-head"><div><span class="step-number">01</span><div class="section-title-wrap"><h2>Start CAM</h2><p>Enter the borrower name to create the appraisal.</p></div></div></div>
+    <div class="start-row"><div class="input-wrap"><label>Company / Borrower Name</label><input id="company" placeholder="e.g. ACME Trading Private Limited"></div><button class="primary-btn" onclick="startCam()">Start CAM <span>→</span></button></div>
+    <div id="camInfo" class="cam-info"></div>
+  </section>
+
+  <section class="card hidden" id="chatCard">
+    <div class="section-head"><div><span class="step-number">02</span><div class="section-title-wrap"><h2>CAM Assistant</h2><p>Capture loan type, amount, purpose, tenure, interest rate and repayment structure.</p></div></div></div>
+    <div id="chat" class="chat-box"></div>
+    <div class="chat-input-row"><input id="message" placeholder="Type your answer here..." onkeydown="if(event.key==='Enter')sendChat()"><button class="primary-btn" onclick="sendChat()">Send</button></div>
+  </section>
+
+  <section class="card hidden" id="policyCard">
+    <div class="section-head"><div><span class="step-number">03</span><div class="section-title-wrap"><h2>Policy Repository — RAG Enabled</h2><p>Upload bank policy documents first. The assistant answers from these documents and returns page-level citations.</p></div></div><span id="policyBadge" class="status-badge">Not indexed</span></div>
+    <div class="rag-grid">
+      <div>
+        <div class="upload-zone"><div class="upload-icon">↑</div><div><strong>Upload Policy Documents</strong><span>PDF, DOCX, PPTX, TXT or policy scans</span></div><label class="choose-btn">Browse Files<input id="policyFiles" type="file" multiple accept=".pdf,.docx,.pptx,.txt,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp"></label></div>
+        <div id="policySelected" class="selected-files"></div><div class="action-row"><button class="primary-btn" onclick="uploadPolicies()">Index Policy Documents →</button></div><div id="policyMsg" class="upload-message"></div><div id="policyList" class="source-list"></div>
+      </div>
+      <div>
+        <div id="policyChat" class="rag-box"><div class="rag-msg ai"><div class="rag-bubble">Upload a policy document and ask questions such as “What is the minimum DSCR?” or “What collateral requirement applies?”</div></div></div>
+        <div class="chat-input-row"><input id="policyQuestion" placeholder="Ask a question about policies..." onkeydown="if(event.key==='Enter')sendPolicyChat()"><button class="primary-btn" onclick="sendPolicyChat()">Ask</button></div>
+      </div>
+    </div>
+    <div class="policy-next"><button id="continueDocsBtn" class="primary-btn locked" onclick="showDocumentCard()">Continue to Borrower Documents →</button></div>
+  </section>
+
+  <section class="card hidden" id="uploadCard">
+    <div class="section-head"><div><span class="step-number">04</span><div class="section-title-wrap"><h2>Borrower / User Documents</h2><p>Upload the borrower's actual supporting documents. OCR and document classification run automatically.</p></div></div></div>
+    <div class="upload-zone"><div class="upload-icon">↑</div><div><strong>Select supporting documents</strong><span>PDF, PNG, JPG, JPEG, TIFF, BMP or WEBP</span></div><label class="choose-btn">Choose Files<input id="documents" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp"></label></div>
+    <div id="selectedFiles" class="selected-files"></div><div id="uploadMsg" class="upload-message"></div><div id="docs" class="docs-grid"></div>
+    <div class="action-row"><button class="primary-btn" onclick="uploadDocs()">Upload & Process <span>→</span></button><button class="secondary-btn" onclick="startAnalysis()">Start CAM Analysis</button></div>
+  </section>
+
+  <section class="card hidden" id="documentChatCard">
+    <div class="section-head"><div><span class="step-number">05</span><div class="section-title-wrap"><h2>Borrower Document Copilot</h2><p>Chat with the uploaded borrower documents. Answers are grounded in extracted evidence and include page/file citations.</p></div></div></div>
+    <div id="documentChat" class="rag-box"></div>
+    <div class="chat-input-row"><input id="documentQuestion" placeholder="Ask about financials, GST, ITR, bank statement, collateral, KYC..." onkeydown="if(event.key==='Enter')sendDocumentChat()"><button class="primary-btn" onclick="sendDocumentChat()">Ask</button></div>
+  </section>
+
+  <section class="card hidden" id="mcaCard">
+    <div class="section-head"><div><span class="step-number">06</span><div class="section-title-wrap"><h2>MCA Company Information — FileSure</h2><p>Company registry data is fetched using the detected or supplied CIN. No CIN is hard-coded.</p></div></div><span id="mcaBadge" class="status-badge">Not fetched</span></div>
+    <div class="mca-toolbar"><div class="input-wrap"><label>CIN (optional)</label><input id="mcaCin" placeholder="Auto-detected from borrower documents" maxlength="21"></div><button class="secondary-btn" onclick="fetchMca()">Fetch / Refresh MCA</button></div>
+    <div id="mcaMessage" class="upload-message"></div><div id="mcaData" class="mca-data"></div>
+  </section>
+
+  <section class="card hidden" id="analysisCard">
+    <div class="section-head"><div><span class="step-number">07</span><div class="section-title-wrap"><h2>CAM Analysis</h2><p>Deterministic financial/rule analysis plus controlled AI narrative generation.</p></div></div></div>
+    <div class="progress-track"><div id="bar"></div></div><p id="status" class="analysis-status"></p><div id="steps" class="steps-grid"></div>
+    <div id="analysisReportNote" class="analysis-report-note hidden">CAM analysis completed. Review the evidence and then generate the final CAM.</div>
+  </section>
+
+  <section class="card hidden" id="templateCard">
+    <div class="section-head"><div><span class="step-number">08</span><div class="section-title-wrap"><h2>Generate Final CAM</h2><p>The bank CAM master template is already stored in the backend. There is no template upload step.</p></div></div></div>
+    <div class="template-row"><div class="success-panel"><span>✓</span> Internal bank CAM master template ready</div><button class="primary-btn" onclick="generateCam()">Generate Final CAM <span>→</span></button></div>
+    <div id="download" class="download-box"></div>
+  </section>
+</div>
+<script>
+let sessionId=null; const $=id=>document.getElementById(id);
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function humanize(s){return String(s||'').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
+function addChat(who,text){const r=document.createElement('div');r.className='chat-message '+(who==='AI'?'ai':'user');r.innerHTML=`<div class="chat-avatar">${who==='AI'?'AI':'You'}</div><div class="chat-bubble"><span>${esc(text)}</span></div>`;$('chat').appendChild(r);$('chat').scrollTop=$('chat').scrollHeight;}
+function addRagMessage(root,who,text,citations=[]){const row=document.createElement('div');row.className='rag-msg '+(who==='AI'?'ai':'user');let h=`<div class="rag-bubble">${esc(text)}`;(citations||[]).forEach(c=>{h+=`<div class="citation"><strong>${esc(c.source_id||'Source')}</strong> · ${esc(c.filename||'Document')}${c.page?` · Page ${esc(c.page)}`:''}${c.doc_type?` · ${esc(c.doc_type)}`:''}</div>`});h+='</div>';row.innerHTML=h;root.appendChild(row);root.scrollTop=root.scrollHeight;}
+async function startCam(){const company=$('company').value.trim();if(!company)return alert('Enter company name');const r=await fetch('/api/cam/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({company_name:company})});const d=await r.json();if(!r.ok)return alert(d.error);sessionId=d.session_id;$('camInfo').innerHTML=`<span class="cam-id-label">CAM ID</span><strong>${esc(d.cam_id)}</strong><span class="divider">|</span><span>Application ${esc(d.application_id)}</span>`;$('chatCard').classList.remove('hidden');addChat('AI',d.message);$('message').focus();}
+async function sendChat(){const msg=$('message').value.trim();if(!msg)return;addChat('You',msg);$('message').value='';const r=await fetch(`/api/cam/chat/${sessionId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});const d=await r.json();addChat('AI',d.reply||d.error);if(d.next==='documents')$('policyCard').classList.remove('hidden');}
+$('policyFiles').addEventListener('change',()=>{$('policySelected').innerHTML=[...$('policyFiles').files].map(f=>`<span class="file-chip">📘 ${esc(f.name)}</span>`).join('');});
+$('documents').addEventListener('change',()=>{$('selectedFiles').innerHTML=[...$('documents').files].map(f=>`<span class="file-chip">📄 ${esc(f.name)}</span>`).join('');});
+async function uploadPolicies(){const files=$('policyFiles').files;if(!files.length)return alert('Select policy documents');const fd=new FormData();[...files].forEach(f=>fd.append('file',f));$('policyMsg').innerHTML='<span class="spinner"></span> Indexing policy documents...';const r=await fetch(`/api/cam/policies/${sessionId}`,{method:'POST',body:fd});const d=await r.json();if(!r.ok)return $('policyMsg').innerHTML=`<span class="error-text">${esc(d.error||'Policy indexing failed')}</span>`;$('policyMsg').innerHTML=`<span class="success-dot">✓</span> ${esc(d.message)}`;$('policyBadge').textContent='Indexed';$('policyBadge').className='status-badge indexed';renderPolicyList(d.results||[]);$('continueDocsBtn').classList.remove('locked');$('policyFiles').value='';}
+function renderPolicyList(items){$('policyList').innerHTML=(items||[]).map(x=>`<div class="source-item"><span>📘 ${esc(x.filename)}</span><span class="muted">${esc(x.status)} · ${esc(x.page_count||1)} page(s)</span></div>`).join('');}
+async function sendPolicyChat(){const q=$('policyQuestion').value.trim();if(!q)return;addRagMessage($('policyChat'),'You',q);$('policyQuestion').value='';const r=await fetch(`/api/cam/policy-chat/${sessionId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})});const d=await r.json();addRagMessage($('policyChat'),'AI',d.answer||d.error||'No answer',d.citations||[]);}
+function showDocumentCard(){$('uploadCard').classList.remove('hidden');$('uploadCard').scrollIntoView({behavior:'smooth',block:'start'});}
+async function uploadDocs(){const files=$('documents').files;if(!files.length)return alert('Select supporting documents');const fd=new FormData();[...files].forEach(f=>fd.append('file',f));$('uploadMsg').innerHTML='<span class="spinner"></span> Processing documents with OCR/classification...';const r=await fetch(`/api/cam/documents/${sessionId}`,{method:'POST',body:fd});const d=await r.json();if(!r.ok)return $('uploadMsg').innerHTML=`<span class="error-text">${esc(d.error||'Document processing failed')}</span>`;$('uploadMsg').innerHTML=`<span class="success-dot">✓</span> ${esc(d.message||'Documents processed successfully')}`;renderDocs(d.results||[]);await refreshMcaFromUpload(d);$('documentChatCard').classList.remove('hidden');$('documentChat').innerHTML='<div class="rag-msg ai"><div class="rag-bubble">Borrower documents are ready. Ask me about the submitted evidence. Answers will include file/page citations.</div></div>';}
+function formatValue(v){if(v===null||v===undefined||v==='')return '—';if(typeof v==='object')return JSON.stringify(v);return String(v);}
+function renderDocs(results){$('docs').innerHTML=(results||[]).map(x=>{if(x.error)return `<article class="doc-card"><div class="doc-error-title">⚠ ${esc(x.original_filename)}</div><div class="error-text">${esc(x.message||x.error)}</div></article>`;const fields=Object.entries(x.extracted_fields||{});return `<article class="doc-card"><div class="doc-top"><div class="doc-file-icon">PDF</div><div class="doc-heading"><div class="doc-file-name">${esc(x.original_filename)}</div><div class="doc-type">${esc(x.display_name||humanize(x.doc_type))}</div></div><span class="status-badge">${esc(humanize(x.status))}</span></div><div class="confidence-row"><div><span>Identification confidence</span><strong>${Number(x.confidence_score||0).toFixed(1)}%</strong></div><div class="confidence-track"><div style="width:${Math.max(0,Math.min(100,Number(x.confidence_score||0)))}%"></div></div></div><div class="fields-card">${fields.length?fields.map(([k,v])=>`<div class="field-row"><span class="field-label">${esc(humanize(k))}</span><span class="field-value">${esc(formatValue(v))}</span></div>`).join(''):'<div class="empty-fields">No structured fields extracted.</div>'}</div></article>`;}).join('');}
+async function sendDocumentChat(){const q=$('documentQuestion').value.trim();if(!q)return;addRagMessage($('documentChat'),'You',q);$('documentQuestion').value='';const r=await fetch(`/api/cam/document-chat/${sessionId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})});const d=await r.json();addRagMessage($('documentChat'),'AI',d.answer||d.error||'No answer',d.citations||[]);}
+function setMcaBadge(s){$('mcaBadge').textContent=humanize(s||'not_fetched');$('mcaBadge').className='status-badge '+(s||'not_fetched');}
+function renderMcaData(payload){const root=$('mcaData');root.innerHTML='';const data=payload?.data||payload||{};const md=data.masterData||{};const company=md.companyData||{};const vals=[['Company Name',company.companyName||data.company],['CIN',data.cin||company.cin],['Company Status',company.companyStatus],['Date Of Incorporation',company.dateOfIncorporation],['Authorised Capital',company.authorisedCapital],['Paid-up Capital',company.paidupCapital]].filter(x=>x[1]!==undefined&&x[1]!==null&&x[1]!=='');root.innerHTML='<div class="mca-section"><div class="mca-section-title">Key MCA Details</div><div class="mca-fields">'+vals.map(x=>`<div class="mca-field"><span>${esc(x[0])}</span><strong>${esc(x[1])}</strong></div>`).join('')+'</div></div>'+(Object.keys(data).length?`<details class="mca-full-wrap"><summary>View More MCA Data</summary><pre>${esc(JSON.stringify(data,null,2))}</pre></details>`:'');}
+async function fetchMca(){if(!sessionId)return alert('Start CAM first');$('mcaCard').classList.remove('hidden');setMcaBadge('fetching');$('mcaMessage').innerHTML='<span class="spinner"></span> Fetching MCA through FileSure...';const cin=$('mcaCin').value.trim();const r=await fetch(`/api/cam/mca/${sessionId}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cin?{cin}:{})});const d=await r.json();if(!r.ok){setMcaBadge('failed');return $('mcaMessage').innerHTML=`<span class="error-text">${esc(d.error||'MCA fetch failed')}</span>`;}$('mcaCin').value=d.cin||'';setMcaBadge('completed');$('mcaMessage').innerHTML=`<span class="success-dot">✓</span> ${esc(d.message||'MCA data fetched')}`;renderMcaData(d);}
+async function refreshMcaFromUpload(response){if(response?.mca?.data){$('mcaCard').classList.remove('hidden');$('mcaCin').value=response.mca.cin||'';setMcaBadge('completed');$('mcaMessage').innerHTML='<span class="success-dot">✓</span> FileSure MCA data fetched automatically.';renderMcaData(response.mca);return;}const r=await fetch(`/api/cam/mca/${sessionId}`);const d=await r.json();if(d.status&&d.status!=='not_fetched'){$('mcaCard').classList.remove('hidden');$('mcaCin').value=d.cin||'';setMcaBadge(d.status);if(d.data)renderMcaData(d);}}
+async function startAnalysis(){const r=await fetch(`/api/cam/analyze/${sessionId}`,{method:'POST'});const d=await r.json();if(!r.ok)return alert(d.error);$('analysisCard').classList.remove('hidden');$('analysisCard').scrollIntoView({behavior:'smooth'});poll();}
+function reportHtml(report,index){if(!report)return '';let h=`<div class="report-body hidden" id="report-${index}"><div class="report-summary">${esc(report.summary||'')}</div>`;(report.sections||[]).forEach(s=>{h+=`<div class="report-section"><div class="report-section-title">${esc(s.title||'Data')}</div>`;(s.rows||[]).forEach(row=>h+=`<div class="report-row"><span>${esc(row.label||'')}</span><strong>${esc(formatValue(row.value))}</strong></div>`);if(s.bullets?.length)h+=`<ul class="report-bullets">${s.bullets.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;h+='</div>';});return h+'</div>';}
+function renderSteps(steps,reports){const map={};(reports||[]).forEach(r=>map[r.title]=r);$('steps').innerHTML=(steps||[]).map((s,i)=>{const rep=map[s.label],done=s.status==='completed';return `<div class="step-card ${done?'step-complete':''}"><div class="step-main"><span class="step-check ${done?'done':''}">${done?'✓':i+1}</span><div><strong>${esc(s.label)}</strong><small>${esc(humanize(s.status))}</small></div></div>${done&&rep?`<button class="report-toggle" data-target="report-${i}">View Report</button>${reportHtml(rep,i)}`:''}</div>`}).join('');$('steps').querySelectorAll('.report-toggle').forEach(b=>b.onclick=()=>{const t=$(b.dataset.target);t.classList.toggle('hidden');b.textContent=t.classList.contains('hidden')?'View Report':'Hide Report';});}
+async function poll(){const r=await fetch(`/api/cam/status/${sessionId}`);const d=await r.json();$('bar').style.width=(d.progress||0)+'%';$('status').textContent=`${d.current_step} · ${d.progress||0}% complete`;renderSteps(d.steps||[],d.reports||[]);if(d.status==='analysis_completed'){$('analysisReportNote').classList.remove('hidden');$('templateCard').classList.remove('hidden');return;}if(d.status==='failed')return alert(d.error);setTimeout(poll,800);}
+async function generateCam(){const r=await fetch(`/api/cam/generate/${sessionId}`,{method:'POST'});const d=await r.json();if(!r.ok)return alert(d.error);$('download').innerHTML=`<div class="download-panel"><div><strong>Final CAM generated successfully</strong><span>Bank-style CAM document is ready.</span></div><div class="download-links"><a href="/api/cam/download/${sessionId}/docx">Download DOCX</a>${d.pdf_available?`<a href="/api/cam/download/${sessionId}/pdf">Download PDF</a>`:''}</div></div>`;}
+
+</script>
+</body>
+</html>

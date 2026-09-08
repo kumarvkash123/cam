@@ -1,0 +1,14 @@
+{
+  "risk_rating": "Moderate",
+  "major_risks": [
+    "High leverage relative to peers",
+    "Auto-sector cyclicality and OEM concentration"
+  ],
+  "mitigants": [
+    "Long supply history with OEM customers",
+    "Automation expected to improve margins"
+  ],
+  "bureau_score": 716,
+  "pd_pct": 2.9,
+  "repayment_conduct": "Satisfactory with occasional utilisation above 90%"
+}

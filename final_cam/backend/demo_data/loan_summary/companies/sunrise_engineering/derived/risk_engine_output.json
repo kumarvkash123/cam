@@ -1,0 +1,14 @@
+{
+  "risk_rating": "Low",
+  "major_risks": [
+    "Customer concentration in top 5 clients",
+    "Raw-material price volatility"
+  ],
+  "mitigants": [
+    "Long-standing customer contracts",
+    "Adequate DSCR and collateral coverage"
+  ],
+  "bureau_score": 742,
+  "pd_pct": 1.8,
+  "repayment_conduct": "Satisfactory"
+}

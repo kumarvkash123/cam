@@ -1,0 +1,23 @@
+{
+  "provider": "MOCK_MCA",
+  "status": "success",
+  "cin": "U15490GJ2016PTC900303",
+  "company_name": "GreenLeaf Foods Pvt. Ltd.",
+  "company_status": "Active",
+  "incorporation_year": 2016,
+  "registered_state": "Gujarat",
+  "registered_city": "Ahmedabad",
+  "authorized_capital_cr": 15.12,
+  "paid_up_capital_cr": 9.41,
+  "industry": "Food Processing",
+  "directors": [
+    {
+      "name": "Promoter A",
+      "designation": "Managing Director"
+    },
+    {
+      "name": "Promoter B",
+      "designation": "Director"
+    }
+  ]
+}

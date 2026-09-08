@@ -1,0 +1,8 @@
+{
+  "provider": "MOCK_BUREAU",
+  "score": 701,
+  "pd_pct": 3.6,
+  "repayment_conduct": "Generally satisfactory; two 15-day delays",
+  "overdue_cr": 0.18,
+  "npa_flag": false
+}

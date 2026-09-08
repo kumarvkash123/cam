@@ -1,0 +1,14 @@
+{
+  "risk_rating": "Low",
+  "major_risks": [
+    "Seasonality in raw-material procurement",
+    "Food safety compliance dependence"
+  ],
+  "mitigants": [
+    "Strong liquidity profile",
+    "Diversified retail and institutional customers"
+  ],
+  "bureau_score": 768,
+  "pd_pct": 1.2,
+  "repayment_conduct": "Satisfactory"
+}

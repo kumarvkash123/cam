@@ -1,0 +1,10 @@
+{
+  "borrower": "Bell Flower Trading Co. Pvt. Ltd.",
+  "facility_type": "Cash Credit",
+  "requested_amount_cr": 8.0,
+  "purpose": "Working capital for inventory and receivables funding",
+  "tenure_months": 12,
+  "rate_pct": 10.25,
+  "repayment": "Generally satisfactory; two 15-day delays",
+  "rm": "Anita Mehta"
+}

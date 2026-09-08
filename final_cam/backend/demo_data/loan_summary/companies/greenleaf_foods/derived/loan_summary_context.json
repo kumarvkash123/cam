@@ -1,0 +1,83 @@
+{
+  "borrower": {
+    "name": "GreenLeaf Foods Pvt. Ltd.",
+    "constitution": "Private Limited Company",
+    "industry": "Food Processing",
+    "business_vintage_years": 10,
+    "existing_customer": true,
+    "cin": "U15490GJ2016PTC900303",
+    "gstin": "24AAGCG9003C1Z5",
+    "location": "Ahmedabad, Gujarat"
+  },
+  "proposal": {
+    "facility_type": "Term Loan",
+    "requested_amount_cr": 6.5,
+    "purpose": "Capacity expansion and installation of a new packaging line",
+    "tenure_months": 72,
+    "interest_rate_pct": 9.35,
+    "repayment": "Satisfactory"
+  },
+  "financials": {
+    "latest_fy": "FY2023-24",
+    "revenue_cr": 91.3,
+    "ebitda_cr": 15.8,
+    "pat_cr": 7.2,
+    "net_worth_cr": 33.6,
+    "total_debt_cr": 17.2,
+    "working_capital_cr": 14.8
+  },
+  "ratios": {
+    "dscr": 3.28,
+    "icr": 5.27,
+    "debt_equity": 0.51,
+    "current_ratio": 1.64,
+    "ebitda_margin_pct": 17.31,
+    "pat_margin_pct": 7.89
+  },
+  "credit": {
+    "bureau_score": 768,
+    "pd_pct": 1.2,
+    "repayment_conduct": "Satisfactory",
+    "overdue_cr": 0
+  },
+  "risk": {
+    "rating": "Low",
+    "major_risks": [
+      "Seasonality in raw-material procurement",
+      "Food safety compliance dependence"
+    ],
+    "mitigants": [
+      "Strong liquidity profile",
+      "Diversified retail and institutional customers"
+    ]
+  },
+  "collateral": {
+    "gross_value_cr": 36.0,
+    "net_value_cr": 28.1,
+    "coverage_ratio": 4.32,
+    "securities": [
+      {
+        "type": "Factory land & building",
+        "gross_value_cr": 22.0,
+        "net_value_cr": 17.6
+      },
+      {
+        "type": "Plant & machinery",
+        "gross_value_cr": 14.0,
+        "net_value_cr": 10.5
+      }
+    ]
+  },
+  "compliance": {
+    "kyc": "Verified",
+    "sanctions": "Clear",
+    "pep": "No Match",
+    "adverse_media": "No Material Adverse Match",
+    "policy_observations": [
+      {
+        "rule": "Core financial thresholds",
+        "status": "No material deviation in synthetic policy checks"
+      }
+    ]
+  }
+}

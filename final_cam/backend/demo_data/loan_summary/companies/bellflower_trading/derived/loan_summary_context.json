@@ -1,0 +1,94 @@
+{
+  "borrower": {
+    "name": "Bell Flower Trading Co. Pvt. Ltd.",
+    "constitution": "Private Limited Company",
+    "industry": "Industrial Equipment Trading",
+    "business_vintage_years": 11,
+    "existing_customer": false,
+    "cin": "U51909MH2015PTC271234",
+    "gstin": "27AAFCB2712L1Z8",
+    "location": "Mumbai, Maharashtra"
+  },
+  "proposal": {
+    "facility_type": "Cash Credit",
+    "requested_amount_cr": 8.0,
+    "purpose": "Working capital for inventory and receivables funding",
+    "tenure_months": 12,
+    "interest_rate_pct": 10.25,
+    "repayment": "Generally satisfactory; two 15-day delays"
+  },
+  "financials": {
+    "latest_fy": "FY2023-24",
+    "revenue_cr": 88.4,
+    "ebitda_cr": 8.5,
+    "pat_cr": 3.7,
+    "net_worth_cr": 22.1,
+    "total_debt_cr": 28.4,
+    "working_capital_cr": 10.0
+  },
+  "ratios": {
+    "dscr": 1.08,
+    "icr": 1.93,
+    "debt_equity": 1.29,
+    "current_ratio": 1.28,
+    "ebitda_margin_pct": 9.62,
+    "pat_margin_pct": 4.19
+  },
+  "credit": {
+    "bureau_score": 701,
+    "pd_pct": 3.6,
+    "repayment_conduct": "Generally satisfactory; two 15-day delays",
+    "overdue_cr": 0.18
+  },
+  "risk": {
+    "rating": "Moderate",
+    "major_risks": [
+      "Leverage increased over three years",
+      "Receivable days remain elevated"
+    ],
+    "mitigants": [
+      "Diversified supplier base",
+      "Promoter infusion proposed before disbursement"
+    ]
+  },
+  "collateral": {
+    "gross_value_cr": 35.5,
+    "net_value_cr": 25.4,
+    "coverage_ratio": 3.17,
+    "securities": [
+      {
+        "type": "Warehouse property",
+        "gross_value_cr": 18.0,
+        "net_value_cr": 13.5
+      },
+      {
+        "type": "Inventory",
+        "gross_value_cr": 9.5,
+        "net_value_cr": 6.7
+      },
+      {
+        "type": "Receivables",
+        "gross_value_cr": 8.0,
+        "net_value_cr": 5.2
+      }
+    ]
+  },
+  "compliance": {
+    "kyc": "Verified",
+    "sanctions": "Clear",
+    "pep": "No Match",
+    "adverse_media": "No Material Adverse Match",
+    "policy_observations": [
+      {
+        "rule": "DSCR >= 1.25x",
+        "actual": 1.08,
+        "status": "Deviation"
+      },
+      {
+        "rule": "ICR >= 2.00x",
+        "actual": 1.93,
+        "status": "Deviation"
+      }
+    ]
+  }
+}

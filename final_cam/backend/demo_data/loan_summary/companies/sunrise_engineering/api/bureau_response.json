@@ -1,0 +1,8 @@
+{
+  "provider": "MOCK_BUREAU",
+  "score": 742,
+  "pd_pct": 1.8,
+  "repayment_conduct": "Satisfactory",
+  "overdue_cr": 0,
+  "npa_flag": false
+}

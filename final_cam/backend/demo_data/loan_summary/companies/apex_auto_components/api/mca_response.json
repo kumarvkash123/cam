@@ -1,0 +1,23 @@
+{
+  "provider": "MOCK_MCA",
+  "status": "success",
+  "cin": "U34300TN2010PTC900404",
+  "company_name": "Apex Auto Components Pvt. Ltd.",
+  "company_status": "Active",
+  "incorporation_year": 2010,
+  "registered_state": "Tamil Nadu",
+  "registered_city": "Chennai",
+  "authorized_capital_cr": 22.73,
+  "paid_up_capital_cr": 14.14,
+  "industry": "Auto Components Manufacturing",
+  "directors": [
+    {
+      "name": "Promoter A",
+      "designation": "Managing Director"
+    },
+    {
+      "name": "Promoter B",
+      "designation": "Director"
+    }
+  ]
+}

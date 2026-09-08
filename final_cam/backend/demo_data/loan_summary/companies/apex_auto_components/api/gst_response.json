@@ -1,0 +1,9 @@
+{
+  "provider": "MOCK_GSTN",
+  "status": "Active",
+  "gstin": "33AALCA9004D1Z2",
+  "legal_name": "Apex Auto Components Pvt. Ltd.",
+  "state": "Tamil Nadu",
+  "fy_turnover_cr": 176.2,
+  "return_compliance_pct": 100
+}

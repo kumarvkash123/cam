@@ -1,0 +1,23 @@
+{
+  "provider": "MOCK_MCA",
+  "status": "success",
+  "cin": "U51909MH2015PTC271234",
+  "company_name": "Bell Flower Trading Co. Pvt. Ltd.",
+  "company_status": "Active",
+  "incorporation_year": 2015,
+  "registered_state": "Maharashtra",
+  "registered_city": "Mumbai",
+  "authorized_capital_cr": 9.95,
+  "paid_up_capital_cr": 6.19,
+  "industry": "Industrial Equipment Trading",
+  "directors": [
+    {
+      "name": "Promoter A",
+      "designation": "Managing Director"
+    },
+    {
+      "name": "Promoter B",
+      "designation": "Director"
+    }
+  ]
+}

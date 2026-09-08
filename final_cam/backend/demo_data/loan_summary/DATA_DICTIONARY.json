@@ -1,0 +1,61 @@
+{
+  "loan_summary_required_groups": {
+    "borrower_profile": [
+      "name",
+      "constitution",
+      "industry",
+      "business_vintage_years",
+      "existing_customer",
+      "CIN",
+      "GSTIN",
+      "location"
+    ],
+    "loan_proposal": [
+      "facility_type",
+      "requested_amount",
+      "purpose",
+      "tenure",
+      "interest_rate",
+      "repayment"
+    ],
+    "key_financials": [
+      "revenue",
+      "EBITDA",
+      "PAT",
+      "net_worth",
+      "total_debt",
+      "working_capital"
+    ],
+    "key_ratios": [
+      "DSCR",
+      "ICR",
+      "Debt/Equity",
+      "Current Ratio",
+      "EBITDA margin",
+      "PAT margin"
+    ],
+    "credit_banking": [
+      "bureau_score",
+      "PD",
+      "repayment_conduct",
+      "overdues",
+      "existing_relationship"
+    ],
+    "risk_compliance": [
+      "risk_rating",
+      "major_risks",
+      "mitigants",
+      "KYC",
+      "sanctions",
+      "PEP",
+      "adverse_media",
+      "policy_observations"
+    ],
+    "collateral": [
+      "security_type",
+      "gross_value",
+      "eligible_net_value",
+      "coverage_ratio"
+    ]
+  }
+}

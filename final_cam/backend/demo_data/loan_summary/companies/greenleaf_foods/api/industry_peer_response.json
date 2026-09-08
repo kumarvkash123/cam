@@ -1,0 +1,7 @@
+{
+  "provider": "MOCK_MARKET_DATA",
+  "industry": "Food Processing",
+  "industry_growth_pct": 10.5,
+  "industry_median_ebitda_margin_pct": 15.8,
+  "borrower_ebitda_margin_pct": 17.31
+}

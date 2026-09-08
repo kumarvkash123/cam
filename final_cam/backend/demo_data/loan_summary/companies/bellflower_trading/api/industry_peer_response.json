@@ -1,0 +1,7 @@
+{
+  "provider": "MOCK_MARKET_DATA",
+  "industry": "Industrial Equipment Trading",
+  "industry_growth_pct": 6.1,
+  "industry_median_ebitda_margin_pct": 10.2,
+  "borrower_ebitda_margin_pct": 9.62
+}

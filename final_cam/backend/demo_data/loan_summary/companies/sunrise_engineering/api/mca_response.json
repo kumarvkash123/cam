@@ -1,0 +1,23 @@
+{
+  "provider": "MOCK_MCA",
+  "status": "success",
+  "cin": "U28910KA2012PTC900101",
+  "company_name": "Sunrise Engineering Pvt. Ltd.",
+  "company_status": "Active",
+  "incorporation_year": 2012,
+  "registered_state": "Karnataka",
+  "registered_city": "Bengaluru",
+  "authorized_capital_cr": 20.38,
+  "paid_up_capital_cr": 12.68,
+  "industry": "Manufacturing of Industrial Machinery",
+  "directors": [
+    {
+      "name": "Promoter A",
+      "designation": "Managing Director"
+    },
+    {
+      "name": "Promoter B",
+      "designation": "Director"
+    }
+  ]
+}

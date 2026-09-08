@@ -1,0 +1,88 @@
+{
+  "borrower": {
+    "name": "Apex Auto Components Pvt. Ltd.",
+    "constitution": "Private Limited Company",
+    "industry": "Auto Components Manufacturing",
+    "business_vintage_years": 16,
+    "existing_customer": true,
+    "cin": "U34300TN2010PTC900404",
+    "gstin": "33AALCA9004D1Z2",
+    "location": "Chennai, Tamil Nadu"
+  },
+  "proposal": {
+    "facility_type": "Term Loan + Cash Credit",
+    "requested_amount_cr": 12.0,
+    "purpose": "Automation capex and incremental working capital",
+    "tenure_months": 84,
+    "interest_rate_pct": 9.75,
+    "repayment": "Satisfactory with occasional utilisation above 90%"
+  },
+  "financials": {
+    "latest_fy": "FY2023-24",
+    "revenue_cr": 176.2,
+    "ebitda_cr": 22.4,
+    "pat_cr": 7.1,
+    "net_worth_cr": 50.5,
+    "total_debt_cr": 60.8,
+    "working_capital_cr": 15.5
+  },
+  "ratios": {
+    "dscr": 1.88,
+    "icr": 2.7,
+    "debt_equity": 1.2,
+    "current_ratio": 1.28,
+    "ebitda_margin_pct": 12.71,
+    "pat_margin_pct": 4.03
+  },
+  "credit": {
+    "bureau_score": 716,
+    "pd_pct": 2.9,
+    "repayment_conduct": "Satisfactory with occasional utilisation above 90%",
+    "overdue_cr": 0
+  },
+  "risk": {
+    "rating": "Moderate",
+    "major_risks": [
+      "High leverage relative to peers",
+      "Auto-sector cyclicality and OEM concentration"
+    ],
+    "mitigants": [
+      "Long supply history with OEM customers",
+      "Automation expected to improve margins"
+    ]
+  },
+  "collateral": {
+    "gross_value_cr": 78.0,
+    "net_value_cr": 58.0,
+    "coverage_ratio": 4.83,
+    "securities": [
+      {
+        "type": "Factory land & building",
+        "gross_value_cr": 38.0,
+        "net_value_cr": 30.4
+      },
+      {
+        "type": "Plant & machinery",
+        "gross_value_cr": 28.0,
+        "net_value_cr": 19.6
+      },
+      {
+        "type": "Receivables",
+        "gross_value_cr": 12.0,
+        "net_value_cr": 8.0
+      }
+    ]
+  },
+  "compliance": {
+    "kyc": "Verified",
+    "sanctions": "Clear",
+    "pep": "No Match",
+    "adverse_media": "No Material Adverse Match",
+    "policy_observations": [
+      {
+        "rule": "Core financial thresholds",
+        "status": "No material deviation in synthetic policy checks"
+      }
+    ]
+  }
+}

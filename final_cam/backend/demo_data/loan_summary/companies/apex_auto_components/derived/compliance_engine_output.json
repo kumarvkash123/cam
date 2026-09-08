@@ -1,0 +1,11 @@
+{
+  "kyc_status": "Verified",
+  "sanctions": "Clear",
+  "pep": "No Match",
+  "policy_observations": [
+    {
+      "rule": "Core financial thresholds",
+      "status": "No material deviation in synthetic policy checks"
+    }
+  ]
+}

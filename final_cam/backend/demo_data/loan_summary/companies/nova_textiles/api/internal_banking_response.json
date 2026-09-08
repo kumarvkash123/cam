@@ -1,0 +1,7 @@
+{
+  "provider": "MOCK_CORE_BANKING",
+  "existing_customer": false,
+  "relationship_since": null,
+  "average_utilisation_pct": 88,
+  "account_conduct": "Watchlist; recurring 20-30 day delays in one facility"
+}

@@ -1,0 +1,28 @@
+{
+  "source": "deterministic_financial_engine",
+  "latest_fy": "FY2023-24",
+  "financials": {
+    "fy": "FY2023-24",
+    "revenue": 176.2,
+    "ebitda": 22.4,
+    "pat": 7.1,
+    "net_worth": 50.5,
+    "debt": 60.8,
+    "current_assets": 70.0,
+    "current_liabilities": 54.5,
+    "interest": 8.3,
+    "debt_service": 15.8
+  },
+  "ratios": {
+    "dscr": 1.88,
+    "icr": 2.7,
+    "debt_equity": 1.2,
+    "current_ratio": 1.28,
+    "ebitda_margin_pct": 12.71,
+    "pat_margin_pct": 4.03,
+    "working_capital_cr": 15.5,
+    "collateral_gross_cr": 78.0,
+    "collateral_net_cr": 58.0,
+    "coverage_ratio": 4.83
+  }
+}

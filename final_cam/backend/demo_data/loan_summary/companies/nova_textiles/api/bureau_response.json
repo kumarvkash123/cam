@@ -1,0 +1,8 @@
+{
+  "provider": "MOCK_BUREAU",
+  "score": 664,
+  "pd_pct": 6.8,
+  "repayment_conduct": "Watchlist; recurring 20-30 day delays in one facility",
+  "overdue_cr": 0.42,
+  "npa_flag": false
+}

@@ -1,0 +1,8 @@
+{
+  "agency": "Synthetic Ratings Agency",
+  "rating": "A",
+  "outlook": "Stable",
+  "rating_date": "2026-08-01",
+  "rationale": "Synthetic rating used only for CAM POC testing.",
+  "source": "Synthetic Ratings Feed"
+}

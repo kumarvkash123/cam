@@ -1,0 +1,9 @@
+{
+  "provider": "MOCK_GSTN",
+  "status": "Active",
+  "gstin": "29AAECS9001A1Z1",
+  "legal_name": "Sunrise Engineering Pvt. Ltd.",
+  "state": "Karnataka",
+  "fy_turnover_cr": 120.5,
+  "return_compliance_pct": 100
+}

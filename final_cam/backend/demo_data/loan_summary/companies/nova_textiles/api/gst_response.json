@@ -1,0 +1,9 @@
+{
+  "provider": "MOCK_GSTN",
+  "status": "Active",
+  "gstin": "08AAECN9005E1Z7",
+  "legal_name": "Nova Textiles Pvt. Ltd.",
+  "state": "Rajasthan",
+  "fy_turnover_cr": 101.5,
+  "return_compliance_pct": 100
+}

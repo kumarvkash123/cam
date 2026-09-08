@@ -1,0 +1,187 @@
+{
+  "thresholds": {
+    "auto_accept": 70,
+    "needs_review": 35
+  },
+  "doc_types": [
+    {
+      "doc_type": "pan_card",
+      "display_name": "PAN Card",
+      "signals": [
+        { "type": "regex", "pattern": "[A-Z]{5}[0-9]{4}[A-Z]{1}", "weight": 35 },
+        { "type": "keyword", "terms": ["Permanent Account Number", "Income Tax Department", "INCOME TAX DEPARTMENT"], "weight": 30, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["Government of India", "GOVT OF INDIA"], "weight": 10, "match_mode": "any", "fuzzy": true },
+        { "type": "layout", "cue": "photo_present", "weight": 15 },
+        { "type": "layout", "cue": "single_page", "weight": 5 },
+        { "type": "negative_keyword", "terms": ["UIDAI", "Unique Identification Authority", "Aadhaar", "\u0906\u0927\u093e\u0930"], "weight": -40 }
+      ]
+    },
+    {
+      "doc_type": "aadhaar_card",
+      "display_name": "Aadhaar Card",
+      "signals": [
+        { "type": "regex", "pattern": "\\d{4}\\s?\\d{4}\\s?\\d{4}", "weight": 30 },
+        { "type": "keyword", "terms": ["UIDAI", "Unique Identification Authority of India"], "weight": 25, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["Aadhaar", "\u0906\u0927\u093e\u0930"], "weight": 15, "match_mode": "any", "fuzzy": true },
+        { "type": "layout", "cue": "qr_code_present", "weight": 15 },
+        { "type": "layout", "cue": "photo_present", "weight": 10 },
+        { "type": "negative_keyword", "terms": ["Permanent Account Number", "Income Tax Department"], "weight": -35 }
+      ]
+    },
+    {
+      "doc_type": "voter_id",
+      "display_name": "Voter ID (EPIC)",
+      "signals": [
+        { "type": "regex", "pattern": "[A-Z]{3}[0-9]{7}", "weight": 30 },
+        { "type": "keyword", "terms": ["Election Commission of India", "Electoral Photo Identity Card", "EPIC"], "weight": 30, "match_mode": "any", "fuzzy": true },
+        { "type": "layout", "cue": "photo_present", "weight": 10 },
+        { "type": "negative_keyword", "terms": ["UIDAI", "Income Tax Department"], "weight": -30 }
+      ]
+    },
+    {
+      "doc_type": "passport",
+      "display_name": "Passport",
+      "signals": [
+        { "type": "regex", "pattern": "[A-Z]{1}[0-9]{7}", "weight": 25 },
+        { "type": "keyword", "terms": ["Republic of India", "Passport", "Type P"], "weight": 30, "match_mode": "any", "fuzzy": true },
+        { "type": "layout", "cue": "mrz_present", "weight": 20 }
+      ]
+    },
+    {
+      "doc_type": "udyam_certificate",
+      "display_name": "Udyam Registration Certificate",
+      "signals": [
+        { "type": "regex", "pattern": "UDYAM-[A-Z]{2}-[0-9]{2}-[0-9]{7}", "weight": 40 },
+        { "type": "keyword", "terms": ["Udyam Registration Number", "Udyam Registration Certificate", "Ministry of Micro, Small and Medium Enterprises"], "weight": 35, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["GSTIN", "Certificate of Registration under GST"], "weight": -15 }
+      ]
+    },
+    {
+      "doc_type": "gst_registration_cert",
+      "display_name": "GST Registration Certificate",
+      "signals": [
+        { "type": "regex", "pattern": "\\d{2}[A-Z]{5}\\d{4}[A-Z]{1}[A-Z0-9]{1}[Z]{1}[A-Z0-9]{1}", "weight": 35 },
+        { "type": "keyword", "terms": ["Certificate of Registration", "Goods and Services Tax", "Registration Certificate"], "weight": 25, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["Form GST REG-06"], "weight": 20, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["Udyam Registration Number"], "weight": -15 }
+      ]
+    },
+    {
+      "doc_type": "partnership_deed",
+      "display_name": "Partnership Deed",
+      "signals": [
+        { "type": "keyword", "terms": ["Partnership Deed", "Deed of Partnership", "Partners have agreed"], "weight": 40, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["Stamp Paper", "Indian Stamp Act"], "weight": 15, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["Memorandum of Association", "Certificate of Incorporation"], "weight": -25 }
+      ]
+    },
+    {
+      "doc_type": "moa_aoa",
+      "display_name": "MOA & AOA",
+      "signals": [
+        { "type": "keyword", "terms": ["Memorandum of Association", "Articles of Association"], "weight": 40, "match_mode": "any", "fuzzy": true },
+        { "type": "regex", "pattern": "[UL][0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}", "weight": 20 },
+        { "type": "negative_keyword", "terms": ["Partnership Deed"], "weight": -25 }
+      ]
+    },
+    {
+      "doc_type": "certificate_of_incorporation",
+      "display_name": "Certificate of Incorporation",
+      "signals": [
+        { "type": "keyword", "terms": ["Certificate of Incorporation", "Registrar of Companies", "Corporate Identity Number"], "weight": 35, "match_mode": "any", "fuzzy": true },
+        { "type": "regex", "pattern": "[UL][0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}", "weight": 30 }
+      ]
+    },
+    {
+      "doc_type": "bank_statement",
+      "display_name": "Bank Statement",
+      "signals": [
+        { "type": "keyword", "terms": ["Bank Statement", "Statement of Account", "Account Statement"], "weight": 20, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["Opening Balance", "Closing Balance"], "weight": 15, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["IFSC", "A/C No", "Account Number", "Account No", "Account Holder"], "weight": 15, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["NEFT", "RTGS", "UPI", "IMPS", "Debit", "Credit"], "weight": 10, "match_mode": "any", "fuzzy": true },
+        { "type": "regex", "pattern": "[A-Z]{4}0[A-Z0-9]{6}", "weight": 15 },
+        { "type": "layout", "cue": "table_structure", "weight": 30 },
+        { "type": "layout", "cue": "multi_page", "weight": 5 },
+        { "type": "negative_keyword", "terms": ["GSTR-3B", "GSTR-1", "Income Tax Return", "Balance Sheet as at", "Profit and Loss"], "weight": -20 }
+      ]
+    },
+    {
+      "doc_type": "itr",
+      "display_name": "Income Tax Return (ITR)",
+      "signals": [
+        { "type": "keyword", "terms": ["Income Tax Return", "Acknowledgement Number", "Assessment Year"], "weight": 30, "match_mode": "any", "fuzzy": true },
+        { "type": "regex", "pattern": "20\\d{2}-\\d{2}", "weight": 15 },
+        { "type": "keyword", "terms": ["ITR-1", "ITR-2", "ITR-3", "ITR-4", "e-Filing"], "weight": 20, "match_mode": "any", "fuzzy": true },
+        { "type": "layout", "cue": "qr_code_present", "weight": 10 },
+        { "type": "negative_keyword", "terms": ["Balance Sheet as at", "Profit and Loss"], "weight": -15 }
+      ]
+    },
+    {
+      "doc_type": "balance_sheet",
+      "display_name": "Balance Sheet",
+      "signals": [
+        { "type": "keyword", "terms": ["Balance Sheet as at", "Balance Sheet"], "weight": 30, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["Total Assets", "Total Liabilities", "Shareholders Funds", "Capital Account"], "weight": 30, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["Profit and Loss Account", "Revenue from Operations"], "weight": -15 }
+      ]
+    },
+    {
+      "doc_type": "profit_loss_statement",
+      "display_name": "Profit & Loss Statement",
+      "signals": [
+        { "type": "keyword", "terms": ["Profit and Loss Account", "Profit & Loss Statement", "Statement of Profit and Loss"], "weight": 30, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["Revenue from Operations", "Total Expenses", "Net Profit"], "weight": 30, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["Balance Sheet as at", "Total Liabilities"], "weight": -15 }
+      ]
+    },
+    {
+      "doc_type": "gstr_3b",
+      "display_name": "GSTR-3B",
+      "signals": [
+        { "type": "keyword", "terms": ["GSTR-3B", "Form GSTR-3B"], "weight": 45, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["Summary of outward supplies", "Tax payable"], "weight": 15, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["GSTR-1", "invoice-wise"], "weight": -20 }
+      ]
+    },
+    {
+      "doc_type": "gstr_1",
+      "display_name": "GSTR-1",
+      "signals": [
+        { "type": "keyword", "terms": ["GSTR-1", "Form GSTR-1"], "weight": 45, "match_mode": "any", "fuzzy": true },
+        { "type": "keyword", "terms": ["invoice-wise", "B2B Invoices", "HSN Summary"], "weight": 15, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["GSTR-3B", "Tax payable"], "weight": -20 }
+      ]
+    },
+    {
+      "doc_type": "trade_license",
+      "display_name": "Trade License",
+      "signals": [
+        { "type": "keyword", "terms": ["Trade License", "Municipal Corporation", "License to conduct trade"], "weight": 40, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["Shop and Establishment Act"], "weight": -15 }
+      ]
+    },
+    {
+      "doc_type": "shop_establishment_cert",
+      "display_name": "Shop & Establishment Certificate",
+      "signals": [
+        { "type": "keyword", "terms": ["Shop and Establishment Act", "Registration Certificate under the Shops"], "weight": 40, "match_mode": "any", "fuzzy": true },
+        { "type": "negative_keyword", "terms": ["Trade License"], "weight": -15 }
+      ]
+    },
+    {
+      "doc_type": "property_papers",
+      "display_name": "Property Papers / Sale Deed",
+      "signals": [
+        { "type": "keyword", "terms": ["Sale Deed", "Title Deed", "Registered Document", "Sub-Registrar"], "weight": 35, "match_mode": "any", "fuzzy": true }
+      ]
+    },
+    {
+      "doc_type": "cibil_report",
+      "display_name": "CIBIL / Credit Bureau Report",
+      "signals": [
+        { "type": "keyword", "terms": ["CIBIL Score", "CIBIL TransUnion", "Credit Information Report", "CIR"], "weight": 40, "match_mode": "any", "fuzzy": true }
+      ]
+    }
+  ]
+}
