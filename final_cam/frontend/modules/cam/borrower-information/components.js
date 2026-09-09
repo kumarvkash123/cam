@@ -144,3 +144,26 @@ export function CopilotDrawer({ open, onClose, chat = [], message, setMessage, s
     </aside>
   );
 }
+
+export function ExternalVerificationMatrix({ rows = [], provider = {} }) {
+  if (!rows.length) return null;
+  return (
+    <section className="journey-card biv12-card">
+      <div className="biv12-title">
+        <h2>Document vs External Verification</h2>
+        <span>{provider?.name || "Verification provider"}{provider?.synthetic ? " · Synthetic POC fallback" : ""}</span>
+      </div>
+      {provider?.synthetic && <div className="biv12-alert warn">FileSure/real verification was unavailable for one or more checks. Synthetic POC verification is clearly labelled and must not be treated as a real registry result.</div>}
+      <div className="biv12-people-table">
+        <div className="head"><b>Field</b><b>Uploaded Document</b><b>Verified Source</b></div>
+        {rows.map((r, i) => (
+          <div key={`${r.field}-${i}`}>
+            <span><strong>{r.field}</strong><br/><SourceBadge status={String(r.status || "pending").toLowerCase()} /></span>
+            <span>{r.document_value ?? "—"}</span>
+            <span>{r.verified_value ?? "—"}<br/><small>{r.verification_source || "—"}</small></span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

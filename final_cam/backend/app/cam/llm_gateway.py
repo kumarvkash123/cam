@@ -24,6 +24,12 @@ MAX_HISTORY_CHARS = 6000
 MAX_MESSAGE_CHARS = 18000
 RETRY_REQUEST_CHARS = 12000
 TIMEOUT_SECONDS = 90
+EMPTY_RESPONSE_RETRY_CHARS = 10000
+MAX_COMPLETION_TOKENS = 1400
+
+
+def _is_gpt_oss(model: str) -> bool:
+    return str(model or "").startswith("openai/gpt-oss-")
 
 
 class LLMGatewayError(RuntimeError):
@@ -116,9 +122,24 @@ def _post(messages: List[Dict[str, str]], *, temperature: float = 0.1,
         "model": model,
         "temperature": temperature,
         "messages": messages,
+        "max_completion_tokens": MAX_COMPLETION_TOKENS,
     }
+    # GPT-OSS returns reasoning separately by default on Groq. Loan-summary and
+    # CAM calls need only the final answer, so exclude reasoning explicitly.
+    # This also prevents reasoning tokens from obscuring an otherwise valid
+    # final response.
+    if _is_gpt_oss(model):
+        payload["include_reasoning"] = False
+        payload["reasoning_effort"] = "low"
     if response_format:
         payload["response_format"] = response_format
+
+    LOGGER.info(
+        "[GROQ-RAW-DEBUG] request model=%s messages=%s chars=%s include_reasoning=%s reasoning_effort=%s response_format=%s",
+        model, len(messages), sum(len(m.get("content") or "") for m in messages),
+        payload.get("include_reasoning"), payload.get("reasoning_effort"),
+        (response_format or {}).get("type") if response_format else "text",
+    )
 
     try:
         response = requests.post(
@@ -131,7 +152,22 @@ def _post(messages: List[Dict[str, str]], *, temperature: float = 0.1,
             timeout=TIMEOUT_SECONDS,
         )
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        choices = data.get("choices") or [] if isinstance(data, dict) else []
+        choice = choices[0] if choices else {}
+        message = choice.get("message") or {} if isinstance(choice, dict) else {}
+        content = message.get("content") if isinstance(message, dict) else None
+        reasoning = message.get("reasoning") if isinstance(message, dict) else None
+        LOGGER.info(
+            "[GROQ-RAW-DEBUG] response status=%s finish_reason=%s content_length=%s reasoning_present=%s message_keys=%s usage=%s",
+            response.status_code,
+            choice.get("finish_reason") if isinstance(choice, dict) else None,
+            len(content) if isinstance(content, str) else 0,
+            bool(reasoning),
+            sorted(message.keys()) if isinstance(message, dict) else [],
+            data.get("usage") if isinstance(data, dict) else None,
+        )
+        return data
     except requests.HTTPError as exc:
         status = exc.response.status_code if exc.response is not None else None
         if status == 413:
@@ -179,10 +215,55 @@ def chat(messages: List[Dict[str, Any]], *, temperature: float = 0.1,
                 ) from retry_exc
             raise
 
+    def _extract_final_text(payload: Dict[str, Any]) -> str:
+        try:
+            choice = payload["choices"][0]
+            message = choice["message"] or {}
+        except (KeyError, IndexError, TypeError) as exc:
+            raise LLMGatewayError("The LLM provider returned an unexpected response.") from exc
+        content = message.get("content")
+        if isinstance(content, str) and content.strip():
+            return content.strip()
+        return ""
+
+    content = _extract_final_text(data)
+    if content:
+        return content
+
+    # HTTP 200 with blank assistant content is different from rate limiting.
+    # Retry once with a smaller context and an explicit final-answer reminder.
+    retry_messages = _prepare_messages(messages, EMPTY_RESPONSE_RETRY_CHARS)
+    if retry_messages:
+        retry_messages = [dict(m) for m in retry_messages]
+        last = retry_messages[-1]
+        if last.get("role") == "user":
+            last["content"] = _trim(
+                (last.get("content") or "")
+                + "\n\nIMPORTANT: Return the final answer as non-empty plain text. Do not return reasoning only.",
+                MAX_MESSAGE_CHARS,
+            )
+    LOGGER.warning(
+        "[GROQ-RAW-DEBUG] empty_content_retry model=%s chars=%s",
+        get_groq_model(), sum(len(m.get("content") or "") for m in retry_messages),
+    )
+    retry_data = _post(retry_messages, temperature=temperature, response_format=response_format)
+    content = _extract_final_text(retry_data)
+    if content:
+        LOGGER.info("[GROQ-RAW-DEBUG] empty_content_retry_success content_length=%s", len(content))
+        return content
+
     try:
-        return data["choices"][0]["message"]["content"]
-    except (KeyError, IndexError, TypeError) as exc:
-        raise LLMGatewayError("The LLM provider returned an unexpected response.") from exc
+        choice = (retry_data.get("choices") or [{}])[0]
+        finish_reason = choice.get("finish_reason")
+        message = choice.get("message") or {}
+        reasoning_present = bool(message.get("reasoning"))
+    except Exception:
+        finish_reason = None
+        reasoning_present = False
+    raise LLMGatewayError(
+        "Groq completed the request but returned no final answer after one controlled retry "
+        f"(finish_reason={finish_reason}, reasoning_present={reasoning_present})."
+    )
 
 
 def generate_json(messages: List[Dict[str, Any]], *, temperature: float = 0.1) -> Dict[str, Any]:

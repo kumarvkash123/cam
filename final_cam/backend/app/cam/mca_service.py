@@ -86,3 +86,23 @@ def get_company_by_cin(cin: str) -> Dict[str, Any]:
         raise RuntimeError("Unexpected MCA API response format.")
 
     return payload
+
+
+def get_company_by_cin_with_fallback(cin: str, allow_synthetic: bool = True) -> Dict[str, Any]:
+    """Use FileSure first; for the Lactose POC only, return clearly-labelled synthetic verification when unavailable."""
+    try:
+        payload = get_company_by_cin(cin)
+        if isinstance(payload, dict):
+            payload.setdefault("_meta", {})
+            payload["_meta"].update({"provider": "FileSure / MCA", "synthetic": False, "verified": True})
+        return payload
+    except Exception as exc:
+        if not allow_synthetic:
+            raise
+        from app.cam.verification.synthetic_provider import LACTOSE_CIN, lactose_company_master
+        normalized = normalize_cin(cin)
+        if normalized == LACTOSE_CIN:
+            payload = lactose_company_master()
+            payload.setdefault("_meta", {})["filesure_error"] = str(exc)
+            return payload
+        raise

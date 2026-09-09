@@ -60,10 +60,35 @@ def _google(company_name: str, industry: str = "") -> Dict[str, Any]:
     }
 
 
+
+def _lactose_public_reference(company_name: str) -> Dict[str, Any]:
+    if "lactose" not in str(company_name or "").lower():
+        return {}
+    return {
+        "mode": "public_reference_poc",
+        "credit_rating": {"agency": "CRISIL", "rating": "BBB-", "outlook": "Stable", "as_of": "10-Jul-2026"},
+        "rated_facilities_cr": 90.0,
+        "listed_status": "BSE Listed",
+        "recent_developments": [{"title": "Rating reaffirmed; rated bank facilities enhanced", "source": "CRISIL public rationale"}],
+        "industry_observations": [{"title": "Lactose, lactulose and pharmaceutical manufacturing", "source": "Company / public disclosures"}],
+        "adverse_news": [],
+        "sources": [
+            {"title": "CRISIL rating rationale", "category": "credit_rating"},
+            {"title": "Lactose India public filings", "category": "company_filings"},
+        ],
+        "note": "POC public-reference data. Refresh from live public sources before credit use.",
+    }
+
+
 def collect_public_information(state: Dict[str, Any], external_data: Dict[str, Any], industry: str = "") -> Dict[str, Any]:
     mode = os.getenv("PUBLIC_SEARCH_MODE", "mock").strip().lower() or "mock"
     if mode == "off":
         return {"mode": "off", "recent_developments": [], "industry_observations": [], "adverse_news": [], "sources": []}
     if mode == "google":
         return _google(state.get("company_name") or "", industry)
-    return _mock(external_data)
+    mock_data = _mock(external_data)
+    if not mock_data.get("credit_rating") and not mock_data.get("recent_developments"):
+        lactose = _lactose_public_reference(state.get("company_name") or "")
+        if lactose:
+            return lactose
+    return mock_data

@@ -6,11 +6,13 @@ export const na = (value) =>
   value === undefined || value === null || value === "" ? "Not available" : value;
 
 export const cr = (value) => {
+  if (value === undefined || value === null || value === "") return "Not available";
   const n = Number(value);
   return Number.isFinite(n) ? `₹ ${n.toFixed(2)} Cr` : "Not available";
 };
 
 export const ratio = (value, suffix = "x") => {
+  if (value === undefined || value === null || value === "") return "Not available";
   const n = Number(value);
   return Number.isFinite(n) ? `${n.toFixed(2)}${suffix}` : "Not available";
 };

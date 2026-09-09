@@ -9,6 +9,7 @@ import {
   ConflictsCard,
   BorrowerOverview,
   CopilotDrawer,
+  ExternalVerificationMatrix,
 } from "../borrower-information/components";
 
 function money(value) {
@@ -63,6 +64,7 @@ export default function Step6(ctx) {
         <BorrowerHeader data={data} />
         <div className="biv12-tabs"><span className="active">Overview</span><span>Corporate Profile</span><span>Promoters & Management</span><span>Business & Operations</span><span>Financial & Banking</span><span>Public Information</span><span>Documents & Sources</span></div>
         <ConflictsCard conflicts={data.source_conflicts || []} />
+        <ExternalVerificationMatrix rows={data.external_verification || []} provider={data.verification_provider || {}} />
         <div className="biv12-top-grid">
           <section className="journey-card biv12-card">
             <div className="biv12-title"><h2>Corporate Profile</h2><span>Source traceable</span></div>

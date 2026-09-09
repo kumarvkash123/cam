@@ -72,12 +72,12 @@ def generate_loan_summary_narrative(summary_evidence: Dict[str, Any]) -> str:
     prompt = (
         "You are assisting a bank credit officer in drafting the Loan Summary section of a Credit Appraisal Memo. "
         "Use ONLY the structured facts supplied below. Do not invent missing information. Do not perform new financial "
-        "calculations and do not recommend sanction, rejection, approval, or decline. Write 140-220 words in plain, "
+        "calculations and do not recommend sanction, rejection, approval, or decline. Write 90-130 words in 3-5 concise sentences in plain, "
         "professional language covering: borrower/business profile; requested facility, amount and purpose; key financial "
         "performance and ratios; credit/repayment conduct; major risks and mitigants; collateral/security position; and only "
         "material compliance or public-information observations. Public-search content is supporting evidence and must be "
         "described cautiously. If an important group is unavailable, state that it is not available from current evidence. "
-        "Return plain text only, no headings, JSON or markdown.\n\n"
+        "Prioritize the overall credit picture; do not repeat every field already shown in the UI. Return plain text only, no headings, JSON or markdown.\n\n"
         f"LOAN_SUMMARY_CONTEXT:\n{json.dumps(summary_evidence, ensure_ascii=False, default=str)}"
     )
     messages = [

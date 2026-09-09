@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Optional
 
+from app.cam.verification.synthetic_provider import LACTOSE_CIN, lactose_company_master
+
 
 def _first(*values):
     for value in values:
@@ -34,7 +36,7 @@ def _flat_mca(api: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def build_loan_summary_context(state: Dict[str, Any], metrics: Dict[str, Any], ratios: Dict[str, Any], mca: Dict[str, Any], risk_flags: List[str], collateral_fields: List[Dict[str, Any]], external_data: Dict[str, Any], public_information: Dict[str, Any]) -> Dict[str, Any]:
+def build_loan_summary_context(state: Dict[str, Any], metrics: Dict[str, Any], ratios: Dict[str, Any], mca: Dict[str, Any], risk_flags: List[str], collateral_fields: List[Dict[str, Any]], external_data: Dict[str, Any], public_information: Dict[str, Any], document_proposal: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     api = external_data.get("api") or {}
     derived = external_data.get("derived") or {}
     mock = derived.get("loan_summary_context") or {}
@@ -42,10 +44,18 @@ def build_loan_summary_context(state: Dict[str, Any], metrics: Dict[str, Any], r
     mock_fin, mock_ratios = mock.get("financials") or {}, mock.get("ratios") or {}
     mca_api = _flat_mca(api)
     proposal_api = api.get("loan_proposal") or {}
+    document_proposal = document_proposal or {}
     bureau = api.get("bureau_response") or {}
     banking = api.get("internal_banking_response") or {}
     screening = api.get("sanctions_screening_response") or {}
     industry_api = api.get("industry_peer_response") or {}
+
+    # Lactose POC private verification: use clearly-labelled synthetic values only
+    # when genuine bank/bureau/collateral integrations are unavailable.
+    state_cin = _first(mca.get("cin"), mca_api.get("cin"), state.get("cin"))
+    lactose_poc = {}
+    if str(state_cin or "").upper() == LACTOSE_CIN or "lactose" in str(state.get("company_name") or "").lower():
+        lactose_poc = (lactose_company_master().get("poc_additional_verification") or {})
 
     borrower = {
         "name": _first(mca.get("company_name"), mca_api.get("company_name"), state.get("company_name"), mock_borrower.get("name")),
@@ -59,17 +69,27 @@ def build_loan_summary_context(state: Dict[str, Any], metrics: Dict[str, Any], r
         "location": _first(mock_borrower.get("location"), ", ".join(x for x in [mca_api.get("registered_city"), mca_api.get("registered_state")] if x)),
         "mca_status": _first(mca.get("status"), mca_api.get("company_status")),
     }
+    # Source priority for proposal terms:
+    # user-confirmed state > uploaded loan application > external proposal API > mock POC.
+    # The uploaded document amount is already normalized to crore by its
+    # document-specific extractor; do not send it through _to_cr again.
     proposal = {
-        "facility_type": _first(state.get("loan_type"), proposal_api.get("facility_type"), mock_proposal.get("facility_type")),
-        "requested_amount_cr": _first(_to_cr(state.get("loan_amount_numeric")), proposal_api.get("requested_amount_cr"), mock_proposal.get("requested_amount_cr")),
-        "purpose": _first(state.get("loan_purpose"), proposal_api.get("purpose"), mock_proposal.get("purpose")),
-        "tenure_months": _first(state.get("tenure"), proposal_api.get("tenure_months"), mock_proposal.get("tenure_months")),
-        "interest_rate_pct": _first(state.get("interest_rate"), proposal_api.get("rate_pct"), mock_proposal.get("interest_rate_pct")),
-        "repayment": _first(state.get("repayment"), proposal_api.get("repayment"), mock_proposal.get("repayment")),
+        "facility_type": _first(state.get("loan_type"), document_proposal.get("facility_type"), proposal_api.get("facility_type"), mock_proposal.get("facility_type")),
+        "requested_amount_cr": _first(_to_cr(state.get("loan_amount_numeric")), document_proposal.get("requested_amount_cr"), proposal_api.get("requested_amount_cr"), mock_proposal.get("requested_amount_cr")),
+        "purpose": _first(state.get("loan_purpose"), document_proposal.get("purpose"), proposal_api.get("purpose"), mock_proposal.get("purpose")),
+        "tenure_months": _first(state.get("tenure"), document_proposal.get("tenure_months"), proposal_api.get("tenure_months"), mock_proposal.get("tenure_months")),
+        "interest_rate_pct": _first(state.get("interest_rate"), document_proposal.get("interest_rate_pct"), proposal_api.get("rate_pct"), mock_proposal.get("interest_rate_pct")),
+        "pricing": _first(document_proposal.get("pricing"), proposal_api.get("pricing")),
+        "repayment": _first(state.get("repayment"), document_proposal.get("repayment"), proposal_api.get("repayment"), mock_proposal.get("repayment")),
+        "moratorium_months": document_proposal.get("moratorium_months"),
+        "processing_fee_pct": document_proposal.get("processing_fee_pct"),
+        "primary_security": document_proposal.get("primary_security"),
+        "collateral": document_proposal.get("collateral"),
+        "proposal_source": document_proposal.get("source_document"),
         "rm": _first(proposal_api.get("rm"), state.get("rm_name")),
     }
     financials = {
-        "latest_fy": _first(mock_fin.get("latest_fy"), (derived.get("computed_financial_metrics") or {}).get("latest_fy")),
+        "latest_fy": _first(metrics.get("latest_fy"), mock_fin.get("latest_fy"), (derived.get("computed_financial_metrics") or {}).get("latest_fy")),
         "revenue_cr": _first(_to_cr(metrics.get("total_revenue")), mock_fin.get("revenue_cr")),
         "ebitda_cr": _first(_to_cr(metrics.get("ebitda")), mock_fin.get("ebitda_cr")),
         "pat_cr": _first(_to_cr(metrics.get("pat")), mock_fin.get("pat_cr")),
@@ -88,12 +108,21 @@ def build_loan_summary_context(state: Dict[str, Any], metrics: Dict[str, Any], r
         "roce_pct": _first(ratios.get("roce"), mock_ratios.get("roce_pct")),
     }
     mock_credit = mock.get("credit") or {}
+    poc_bureau = lactose_poc.get("credit_bureau") or {}
+    poc_banking = lactose_poc.get("banking_conduct") or {}
     credit = {
-        "bureau_score": _first(bureau.get("score"), mock_credit.get("bureau_score")),
+        "bureau_score": _first(bureau.get("score"), mock_credit.get("bureau_score"), poc_bureau.get("company_score")),
         "pd_pct": _first(bureau.get("pd_pct"), mock_credit.get("pd_pct")),
-        "repayment_conduct": _first(bureau.get("repayment_conduct"), banking.get("account_conduct"), mock_credit.get("repayment_conduct")),
-        "overdue_cr": _first(bureau.get("overdue_cr"), mock_credit.get("overdue_cr")),
-        "average_utilisation_pct": banking.get("average_utilisation_pct"),
+        "repayment_conduct": _first(bureau.get("repayment_conduct"), banking.get("account_conduct"), mock_credit.get("repayment_conduct"), poc_banking.get("interest_servicing")),
+        "overdue_cr": _first(bureau.get("overdue_cr"), mock_credit.get("overdue_cr"), 0 if poc_banking.get("overdue_days") == 0 else None),
+        "average_utilisation_pct": _first(banking.get("average_utilisation_pct"), 88.4 if poc_banking else None),
+        "maximum_utilisation_pct": _first(banking.get("maximum_utilisation_pct"), 96.2 if poc_banking else None),
+        "sma_status": _first(banking.get("sma_status"), poc_banking.get("sma_status")),
+        "account_status": _first(banking.get("account_status"), poc_banking.get("account_status")),
+        "cheque_returns": _first(banking.get("cheque_returns"), 0 if poc_banking else None),
+        "existing_exposure_cr": banking.get("existing_exposure_cr"),
+        "source": "synthetic_poc" if poc_banking or poc_bureau else ("api" if bureau or banking else None),
+        "synthetic": bool(poc_banking or poc_bureau),
     }
     mock_risk, derived_risk = mock.get("risk") or {}, derived.get("risk_engine_output") or {}
     primary_risks = derived_risk.get("major_risks") or mock_risk.get("major_risks") or []
@@ -103,25 +132,45 @@ def build_loan_summary_context(state: Dict[str, Any], metrics: Dict[str, Any], r
         "mitigants": derived_risk.get("mitigants") or mock_risk.get("mitigants") or [],
     }
     mock_collateral = mock.get("collateral") or {}
+    poc_collateral = lactose_poc.get("collateral") or {}
+    # Synthetic valuation amounts are POC-only and kept separate from genuine evidence.
+    poc_gross = 82.0 if poc_collateral else None
+    poc_net = 69.7 if poc_collateral else None
+    requested = proposal.get("requested_amount_cr")
+    poc_coverage = round(poc_net / requested, 2) if poc_net is not None and requested not in (None, 0) else None
+    proposal_securities = []
+    if proposal.get("primary_security"):
+        proposal_securities.append({"label": "Primary Security", "value": proposal.get("primary_security"), "source": "Loan Application"})
+    if proposal.get("collateral"):
+        proposal_securities.append({"label": "Collateral", "value": proposal.get("collateral"), "source": "Loan Application"})
     collateral = {
-        "gross_value_cr": mock_collateral.get("gross_value_cr"),
-        "net_value_cr": mock_collateral.get("net_value_cr"),
-        "coverage_ratio": mock_collateral.get("coverage_ratio"),
-        "securities": mock_collateral.get("securities") or collateral_fields or [],
+        "gross_value_cr": _first(mock_collateral.get("gross_value_cr"), poc_gross),
+        "net_value_cr": _first(mock_collateral.get("net_value_cr"), poc_net),
+        "coverage_ratio": _first(mock_collateral.get("coverage_ratio"), poc_coverage),
+        "securities": mock_collateral.get("securities") or proposal_securities or collateral_fields or [],
+        "title_status": poc_collateral.get("title_status"),
+        "valuation_status": poc_collateral.get("valuation_status"),
+        "source": "synthetic_poc" if poc_collateral else ("document" if collateral_fields or proposal_securities else None),
+        "synthetic": bool(poc_collateral),
     }
     mock_compliance, derived_compliance = mock.get("compliance") or {}, derived.get("compliance_engine_output") or {}
     compliance = {
+        # Do not fabricate KYC/sanctions/PEP results. Missing private verification
+        # stays pending in the UI.
         "kyc": _first(derived_compliance.get("kyc_status"), mock_compliance.get("kyc")),
         "sanctions": _first(screening.get("sanctions"), mock_compliance.get("sanctions")),
         "pep": _first(screening.get("pep"), mock_compliance.get("pep")),
         "adverse_media": _first(screening.get("adverse_media"), mock_compliance.get("adverse_media")),
         "policy_observations": derived_compliance.get("policy_observations") or mock_compliance.get("policy_observations") or [],
+        "source": "api" if screening else ("mock" if mock_compliance else None),
     }
     sources = []
     if external_data.get("mock_matched"):
         sources.append({"type": "mock_api", "label": "Synthetic external API data", "status": "available"})
     if any(v is not None for v in metrics.values()):
         sources.append({"type": "documents", "label": "Uploaded financial documents", "status": "available"})
+    if document_proposal:
+        sources.append({"type": "proposal_document", "label": document_proposal.get("source_document") or "Uploaded loan application", "status": "available"})
     if mca:
         sources.append({"type": "mca", "label": "MCA / FileSure", "status": "available"})
     if public_information.get("mode") != "off":

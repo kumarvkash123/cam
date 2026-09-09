@@ -243,6 +243,12 @@ def build_borrower_profile(state: Dict[str, Any], documents: List[Dict[str, Any]
         "bank_relationship": bank_relationship,
         "public_information": public_information,
         "source_conflicts": conflicts,
+        "external_verification": (state.get("verification_bundle") or {}).get("reconciliation") or [],
+        "verification_provider": {
+            "name": (state.get("verification_bundle") or {}).get("provider"),
+            "source_kind": (state.get("verification_bundle") or {}).get("source_kind"),
+            "synthetic": bool((state.get("verification_bundle") or {}).get("synthetic")),
+        },
         "sources": sources,
         "verification_summary": {
             "total_sources": len(sources),

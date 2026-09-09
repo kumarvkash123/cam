@@ -242,6 +242,7 @@ function CAMWorkspace() {
 
   const [policyFiles, setPolicyFiles] = useState([]);
   const [docFiles, setDocFiles] = useState([]);
+  const [docUploadBusy, setDocUploadBusy] = useState(false);
 
   const [reviewDocIndex, setReviewDocIndex] = useState(0);
   const [mappingEdits, setMappingEdits] = useState({});
@@ -524,8 +525,9 @@ function CAMWorkspace() {
       fd.append("file", f);
     });
 
+    setDocUploadBusy(true);
     setDocMsg(
-      "Processing documents with OCR/classification..."
+      `Processing ${docFiles.length} document${docFiles.length === 1 ? "" : "s"} with OCR, classification and extraction...`
     );
 
     try {
@@ -566,6 +568,8 @@ function CAMWorkspace() {
       ]);
     } catch (e) {
       setDocMsg(`Error: ${e.message}`);
+    } finally {
+      setDocUploadBusy(false);
     }
   }
 
@@ -1272,6 +1276,7 @@ function CAMWorkspace() {
       setPolicyFiles,
       docFiles,
       setDocFiles,
+      docUploadBusy,
       reviewDocIndex,
       setReviewDocIndex,
       mappingEdits,

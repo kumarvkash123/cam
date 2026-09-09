@@ -51,9 +51,27 @@ def _fuzzy_contains(text: str, term: str, threshold: int = 82) -> bool:
     return fuzz.partial_ratio(term.lower(), text.lower()) >= threshold
 
 
-def _score_doc_type(text: str, layout: dict, doc_cfg: dict) -> (float, List[str]):
+def _score_doc_type(text: str, layout: dict, doc_cfg: dict, filename: str = "") -> (float, List[str]):
     score = 0.0
     matched = []
+
+    # Filename is strong evidence for business documents because many corporate
+    # filings use stable names (MGT-7, Shareholding Pattern, Annual Report, etc.).
+    # It is additive rather than a hard override, so text can still correct a bad filename.
+    for fsignal in doc_cfg.get("filename_signals", []):
+        pattern = fsignal.get("pattern")
+        terms = fsignal.get("terms", [])
+        weight = float(fsignal.get("weight", 0))
+        fname = (filename or "").lower()
+        hit = False
+        if pattern and re.search(pattern, filename or "", flags=re.I):
+            hit = True
+            matched.append(f"filename_regex:{pattern}")
+        elif terms and any(str(t).lower() in fname for t in terms):
+            hit = True
+            matched.append(f"filename:{next(t for t in terms if str(t).lower() in fname)}")
+        if hit:
+            score += weight
 
     for signal in doc_cfg["signals"]:
         sig_type = signal["type"]
@@ -97,13 +115,13 @@ def _score_doc_type(text: str, layout: dict, doc_cfg: dict) -> (float, List[str]
     return score, matched
 
 
-def classify(text: str, layout: dict) -> ClassificationResult:
+def classify(text: str, layout: dict, filename: str = "") -> ClassificationResult:
     config = _load_config()
     thresholds = config["thresholds"]
 
     candidates = []
     for doc_cfg in config["doc_types"]:
-        score, matched = _score_doc_type(text, layout, doc_cfg)
+        score, matched = _score_doc_type(text, layout, doc_cfg, filename=filename)
         candidates.append({
             "doc_type": doc_cfg["doc_type"],
             "display_name": doc_cfg["display_name"],

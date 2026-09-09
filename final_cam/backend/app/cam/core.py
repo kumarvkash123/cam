@@ -36,6 +36,8 @@ from app.cam.regulatory_compliance import build_regulatory_compliance
 from app.cam.llm_service import generate_cam_narratives
 from app.cam.rag_chat import answer_question
 from app.cam.response_formatter import format_assistant_response
+from app.cam.normalized import build_normalized_cam_data
+from app.cam.final_cam import build_twenty_page_cam
 from app.cam.web_search import google_search
 from docx import Document as DocxDocument
 from docx.shared import Pt
@@ -225,7 +227,7 @@ def process_single_file(db, application_id, file_storage):
         print(f"[CAM EXTRACTION] characters: {len(text or '')}")
         print("=" * 70 + "\n")
 
-        result = classifier.classify(text, layout)
+        result = classifier.classify(text, layout, filename=original_filename)
         status = "low_confidence" if result.decision == "llm_fallback" else result.decision
         fields = field_extraction.extract_fields(result.doc_type, text)
 
@@ -238,7 +240,7 @@ def process_single_file(db, application_id, file_storage):
             original_filename=original_filename,
             stored_filename=os.path.basename(stored_path),
             storage_path=stored_path,
-            extracted_text=text[:20000],
+            extracted_text=text[:500000],
             doc_type=result.doc_type,
             confidence_score=result.score,
             classification_method="rules",
@@ -388,15 +390,18 @@ def fetch_mca_for_session(session_id, cin=None):
     }
     save_cam(state)
 
-    payload = mca_service.get_company_by_cin(cin)
+    payload = mca_service.get_company_by_cin_with_fallback(cin, allow_synthetic=True)
 
     state = get_cam(session_id)
+    meta = payload.get("_meta", {}) if isinstance(payload, dict) else {}
     state["mca"] = {
         "status": "completed",
         "cin": cin,
         "fetched_at": now_iso(),
         "data": payload,
         "error": None,
+        "source": meta.get("provider") or "FileSure / MCA",
+        "synthetic": bool(meta.get("synthetic")),
     }
     save_cam(state)
     return state["mca"]
@@ -430,6 +435,13 @@ def process_analysis(session_id):
             raise ValueError('Application not found')
         documents = [document_payload(d, include_text=True) for d in row.documents]
         db.close()
+
+        # Build one source-of-truth bundle: uploaded raw evidence -> FileSure/synthetic verification -> deterministic calculations.
+        normalized = build_normalized_cam_data(state, documents)
+        state = get_cam(session_id)
+        state['normalized_cam_data'] = normalized
+        state['verification_bundle'] = normalized.get('verification')
+        save_cam(state)
 
         state = get_cam(session_id); state['analysis_stages']['evidence']='completed'; state['analysis_stages']['financial']='running'; state['progress']=20; state['current_step']='Preparing financial evidence'; save_cam(state)
         # Loan Summary builder performs deterministic financial/risk normalization before Groq narration.
@@ -851,7 +863,11 @@ def generate_cam(session_id):
     documents=[document_payload(d,include_text=True) for d in row.documents]
     db.close()
     output_docx=OUTPUT_DIR/f"{state['cam_id']}.docx"
-    doc=build_detailed_cam_document(state,documents)
+    normalized = state.get('normalized_cam_data') or build_normalized_cam_data(state, documents)
+    state['normalized_cam_data'] = normalized
+    state['verification_bundle'] = normalized.get('verification')
+    save_cam(state)
+    doc=build_twenty_page_cam(state, documents, normalized)
     doc.save(str(output_docx))
     pdf_path=OUTPUT_DIR/f"{state['cam_id']}.pdf"
     pdf_created=False

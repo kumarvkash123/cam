@@ -12,6 +12,7 @@ suggestion, until you've confirmed your entity's authorization status.
 
 import re
 from typing import Dict, Optional
+from app.cam.extraction_ext import extract_annual_report_fields
 
 
 def _mask_middle(value: str, keep_start: int = 0, keep_end: int = 4) -> str:
@@ -52,6 +53,117 @@ def _extract_line_after_label(text: str, label: str) -> Optional[str]:
     return m.group(1).strip() if m else None
 
 
+
+def _clean_value(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    value = re.sub(r"\s+", " ", str(value)).strip(" :-\t\r\n")
+    return value or None
+
+
+def _extract_named_value(text: str, labels: list[str], max_chars: int = 500) -> Optional[str]:
+    """Extract a value immediately following a form/table label.
+
+    Works for text extracted from two-column PDFs where a label and value may be
+    on the same line or on adjacent lines.  It intentionally stops at the next
+    known form label rather than consuming narrative text.
+    """
+    labels_escaped = "|".join(re.escape(x) for x in labels)
+    next_labels = [
+        "Cam Id", "Application Date", "Facility", "Requested Amount Cr",
+        "Requested Amount", "Loan Amount", "Purpose", "Tenor Months",
+        "Tenure Months", "Moratorium Months", "Repayment", "Pricing",
+        "Interest Rate", "Processing Fee Pct", "Processing Fee",
+        "Primary Security", "Collateral", "Declaration"
+    ]
+    stop = "|".join(re.escape(x) for x in next_labels)
+    pattern = re.compile(
+        rf"(?:^|\n)\s*(?:{labels_escaped})\s*[:\-]?\s*(?:\n\s*)?(.*?)"
+        rf"(?=(?:\n\s*(?:{stop})\s*[:\-]?)|\Z)",
+        re.IGNORECASE | re.DOTALL,
+    )
+    m = pattern.search(text or "")
+    if not m:
+        return None
+    return _clean_value(m.group(1)[:max_chars])
+
+
+def _extract_decimal(value: Optional[str]) -> Optional[float]:
+    if not value:
+        return None
+    m = re.search(r"[-+]?\d[\d,]*(?:\.\d+)?", str(value))
+    if not m:
+        return None
+    try:
+        return float(m.group().replace(",", ""))
+    except ValueError:
+        return None
+
+
+def _extract_loan_application_fields(text: str) -> Dict[str, object]:
+    """Extract only borrower-provided proposal terms from a loan application.
+
+    Values stay in the units printed on the form.  In particular, fields named
+    `*_cr` are already in crore and must NOT be treated as rupee amounts later.
+    """
+    out: Dict[str, object] = {"document_kind": "loan_application"}
+
+    facility = _extract_named_value(text, ["Facility", "Facility Type", "Loan Type"])
+    amount_raw = _extract_named_value(text, ["Requested Amount Cr", "Requested Amount", "Loan Amount"])
+    purpose = _extract_named_value(text, ["Purpose", "Purpose of Loan"])
+    tenure_raw = _extract_named_value(text, ["Tenor Months", "Tenure Months", "Tenure"])
+    moratorium_raw = _extract_named_value(text, ["Moratorium Months", "Moratorium"])
+    repayment = _extract_named_value(text, ["Repayment", "Repayment Structure"])
+    pricing = _extract_named_value(text, ["Pricing", "Interest Rate", "Rate of Interest"])
+    fee_raw = _extract_named_value(text, ["Processing Fee Pct", "Processing Fee"])
+    primary_security = _extract_named_value(text, ["Primary Security", "Security"])
+    collateral = _extract_named_value(text, ["Collateral"])
+    application_date = _extract_named_value(text, ["Application Date"])
+    cam_id = _extract_named_value(text, ["Cam Id", "CAM ID"])
+
+    amount = _extract_decimal(amount_raw)
+    tenure = _extract_decimal(tenure_raw)
+    moratorium = _extract_decimal(moratorium_raw)
+    fee = _extract_decimal(fee_raw)
+
+    if facility:
+        out["facility_type"] = facility
+        out["proposal_type"] = "Fresh" if re.search(r"\bfresh\b", facility, re.I) else None
+    if amount is not None:
+        # The preferred test form explicitly labels this field in crore.
+        if re.search(r"Requested Amount Cr", text or "", re.I):
+            out["requested_amount_cr"] = amount
+        else:
+            # Preserve the raw amount for downstream normalization where the
+            # source label did not declare a unit.
+            out["requested_amount_raw"] = amount
+            out["requested_amount_text"] = amount_raw
+    if purpose:
+        out["purpose"] = purpose
+    if tenure is not None:
+        out["tenure_months"] = int(tenure) if tenure.is_integer() else tenure
+    if moratorium is not None:
+        out["moratorium_months"] = int(moratorium) if moratorium.is_integer() else moratorium
+    if repayment:
+        out["repayment"] = repayment
+    if pricing:
+        out["pricing"] = pricing
+        rate = re.search(r"(\d+(?:\.\d+)?)\s*%", pricing)
+        if rate:
+            out["interest_rate_pct"] = float(rate.group(1))
+    if fee is not None:
+        out["processing_fee_pct"] = fee
+    if primary_security:
+        out["primary_security"] = primary_security
+    if collateral:
+        out["collateral"] = collateral
+    if application_date:
+        out["application_date"] = application_date
+    if cam_id:
+        out["source_cam_id"] = cam_id
+
+    return {k: v for k, v in out.items() if v not in (None, "")}
+
 def extract_fields(doc_type: str, text: str) -> Dict[str, Optional[str]]:
     fields = {}
 
@@ -62,7 +174,13 @@ def extract_fields(doc_type: str, text: str) -> Dict[str, Optional[str]]:
     if cin:
         fields["cin"] = cin.group().upper()
 
-    if doc_type == "pan_card":
+    if doc_type == "annual_report":
+        fields.update(extract_annual_report_fields(text))
+
+    elif doc_type == "loan_application":
+        fields.update(_extract_loan_application_fields(text))
+
+    elif doc_type == "pan_card":
         m = re.search(r"[A-Z]{5}[0-9]{4}[A-Z]{1}", text)
         if m:
             fields["pan_number_masked"] = _mask_middle(m.group(), keep_start=0, keep_end=4)

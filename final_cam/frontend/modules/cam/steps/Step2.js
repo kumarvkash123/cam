@@ -99,6 +99,7 @@ export default function Step2(ctx) {
     setPolicyFiles,
     docFiles,
     setDocFiles,
+    docUploadBusy,
     reviewDocIndex,
     setReviewDocIndex,
     mappingEdits,
@@ -296,6 +297,7 @@ export default function Step2(ctx) {
                   type="file"
                   multiple
                   accept={ACCEPT_DOCS}
+                  disabled={docUploadBusy}
                   onChange={(e) =>
                     setDocFiles([
                       ...e.target.files,
@@ -315,7 +317,17 @@ export default function Step2(ctx) {
               </div>
             )}
 
-            <div className="upload-message">
+            {docUploadBusy && (
+              <div className="document-upload-loader" role="status" aria-live="polite">
+                <span className="document-upload-spinner" aria-hidden="true" />
+                <div>
+                  <strong>Processing borrower documents</strong>
+                  <small>OCR, document classification and field extraction are running. Please keep this page open.</small>
+                </div>
+              </div>
+            )}
+
+            <div className={`upload-message ${docUploadBusy ? "processing" : ""}`}>
               {docMsg}
             </div>
 
@@ -323,13 +335,13 @@ export default function Step2(ctx) {
               <button
                 className="bob-btn"
                 onClick={uploadDocs}
-                disabled={!sessionId}
+                disabled={!sessionId || docUploadBusy}
               >
-                Upload & Process Documents →
+                {docUploadBusy ? <><span className="spinner" /> Processing Documents...</> : "Upload & Process Documents →"}
               </button>
             </div>
 
-            <div className="panel-title doc-list-title">
+            <div className={`panel-title doc-list-title ${docUploadBusy ? "upload-list-disabled" : ""}`}>
               <h2>
                 Processed Documents
               </h2>
